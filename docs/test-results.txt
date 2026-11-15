@@ -1,0 +1,15 @@
+PASS eachFactoryCreatesItsVehicle
+PASS catalogRejectsDuplicateId
+PASS facadeRejectsUnknownId
+PASS quoteLeavesVehicleAvailable
+PASS hourlyAndDailyRatesDiffer
+PASS addOnsWorkSeparately
+PASS addOnsStackWithBreakdown
+PASS invalidTariffAndDurationAreRejected
+PASS rentReturnAndRentAgain
+PASS doubleRentalDoesNotPublish
+PASS invalidReturnAndBlankNameAreRejected
+PASS bothObserversReceiveBothEvents
+PASS fullConsoleScenario
+PASS cancelAndBadInputLeaveRentalUntouched
+14 tests passed.

@@ -1,0 +1,15 @@
+digraph Classes {
+ graph [bgcolor="transparent", rankdir=LR, nodesep=0.28, ranksep=0.45, compound=true];
+ node [shape=box, style="rounded,filled", fillcolor="#eef4fa", color="#7794aa", fontname="DejaVu Sans", fontsize=11];
+ edge [color="#45637a", arrowsize=0.65];
+ subgraph cluster_rental {
+ label="Rental"; color="#8ca5ba";
+ RentalService -> RentalSlot;
+ RentalSlot -> RentalState;
+ Available -> RentalState [style=dashed,arrowhead=empty];
+ Rented -> RentalState [style=dashed,arrowhead=empty];
+ RentalService -> RentalObserver;
+ CustomerNotifier -> RentalObserver [style=dashed,arrowhead=empty];
+ RentalLog -> RentalObserver [style=dashed,arrowhead=empty];
+ }
+ }
