@@ -1,0 +1,129 @@
+@startuml
+title Vehicle Rental System - Class Diagram
+
+top to bottom direction
+show circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam nodesep 25
+skinparam ranksep 35
+
+package "Catalog - Ataly" {
+    class RentalFacade {
+        +addVehicle(type: String, id: String, model: String): Vehicle
+        +quote(id, rate, duration, insurance, delivery): Quote
+        +rent(id, customer, rate, duration, insurance, delivery): Quote
+        +returnVehicle(id: String): void
+    }
+
+    class VehicleCatalog
+    abstract class Vehicle
+    class Car
+    class Bike
+    class Van
+
+    abstract class VehicleFactory {
+        +addTo(catalog: VehicleCatalog, id: String, model: String): Vehicle
+        #createVehicle(id: String, model: String): Vehicle
+    }
+
+    class CarFactory
+    class BikeFactory
+    class VanFactory
+
+    RentalFacade *-- VehicleCatalog
+    RentalFacade ..> VehicleFactory : uses
+    VehicleCatalog --> "0..*" Vehicle : stores
+
+    VehicleFactory <|-- CarFactory
+    VehicleFactory <|-- BikeFactory
+    VehicleFactory <|-- VanFactory
+
+    Vehicle <|-- Car
+    Vehicle <|-- Bike
+    Vehicle <|-- Van
+
+    CarFactory ..> Car : creates
+    BikeFactory ..> Bike : creates
+    VanFactory ..> Van : creates
+}
+
+package "Pricing - Abylai" {
+    class PricingService
+    class Quote {
+        +total(): int
+    }
+
+    interface PricingStrategy {
+        +calculate(vehicle: Vehicle, duration: int): int
+    }
+
+    class HourlyPricing
+    class DailyPricing
+
+    interface PriceComponent {
+        +calculate(): Quote
+    }
+
+    class BasePrice
+    class InsurancePrice
+    class DeliveryPrice
+
+    PricingService ..> PricingStrategy : selects tariff
+    PricingService ..> PriceComponent : builds price
+
+    PricingStrategy <|.. HourlyPricing
+    PricingStrategy <|.. DailyPricing
+
+    PriceComponent <|.. BasePrice
+    PriceComponent <|.. InsurancePrice
+    PriceComponent <|.. DeliveryPrice
+
+    BasePrice --> PricingStrategy : uses
+    BasePrice ..> Quote : creates
+    InsurancePrice --> PriceComponent : wraps
+    DeliveryPrice --> PriceComponent : wraps
+}
+
+package "Rental - Nazar" {
+    class RentalService {
+        +rent(id: String, customer: String, total: int): void
+        +returnVehicle(id: String): void
+        +subscribe(observer: RentalObserver): void
+    }
+
+    class RentalSlot
+
+    interface RentalState {
+        +rent(slot: RentalSlot, rental: Rental): void
+        +returnVehicle(slot: RentalSlot): Rental
+    }
+
+    class Available
+    class Rented
+    class Rental <<record>>
+    class RentalEvent <<record>>
+
+    interface RentalObserver {
+        +onEvent(event: RentalEvent): void
+    }
+
+    class CustomerNotifier
+    class RentalLog
+
+    RentalService *-- "0..*" RentalSlot
+    RentalSlot --> "1" RentalState : current state
+    RentalState <|.. Available
+    RentalState <|.. Rented
+    Rented --> Rental : active rental
+
+    RentalService --> "0..*" RentalObserver : subscribers
+    RentalService ..> RentalEvent : publishes
+    RentalObserver <|.. CustomerNotifier
+    RentalObserver <|.. RentalLog
+}
+
+RentalFacade --> PricingService : gets price
+RentalFacade --> RentalService : rents and returns
+@enduml
